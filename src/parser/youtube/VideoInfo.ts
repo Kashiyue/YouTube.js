@@ -110,7 +110,8 @@ class VideoInfo {
         channel: info.microformat?.channel,
         is_unlisted: info.microformat?.is_unlisted,
         is_family_safe: info.microformat?.is_family_safe,
-        has_ypc_metadata: info.microformat?.has_ypc_metadata
+        has_ypc_metadata: info.microformat?.has_ypc_metadata,
+        live_broadcast_details: info.microformat?.live_broadcast_details
       },
       like_count: undefined as number | undefined,
       is_liked: undefined as boolean | undefined,
