@@ -6,7 +6,6 @@ import Player from '../../core/Player';
 import TwoColumnWatchNextResults from '../classes/TwoColumnWatchNextResults';
 import VideoPrimaryInfo from '../classes/VideoPrimaryInfo';
 import VideoSecondaryInfo from '../classes/VideoSecondaryInfo';
-import PlayerMicroformat from '../classes/PlayerMicroformat';
 import Format from '../classes/misc/Format';
 
 import MerchandiseShelf from '../classes/MerchandiseShelf';
@@ -27,6 +26,7 @@ import type { XMLDocument } from 'linkedom/types/xml/document';
 import type { Element } from 'linkedom/types/interface/element';
 import { getStringBetweenStrings, InnertubeError, streamToIterable } from '../../utils/Utils';
 import type { Node } from 'linkedom/types/interface/node';
+import PlayerMicroformat from '../classes/PlayerMicroformat';
 
 export type URLTransformer = (url: URL) => URL;
 
@@ -91,13 +91,13 @@ class VideoInfo {
     const info = Parser.parseResponse(data[0].data);
     const next = data?.[1]?.data ? Parser.parseResponse(data[1].data) : undefined;
 
-    this.#page = [ info, next ];
+    this.#page = [info, next];
+    
+    if (!info.microformat?.is(PlayerMicroformat))
+    throw new InnertubeError('Invalid microformat', info.microformat);
 
     if (info.playability_status?.status === 'ERROR')
       throw new InnertubeError('This video is unavailable', info.playability_status);
-
-    if (!info.microformat?.is(PlayerMicroformat))
-      throw new InnertubeError('Invalid microformat', info.microformat);
 
     this.basic_info = { // This type is inferred so no need for an explicit type
       ...info.video_details,
@@ -439,7 +439,7 @@ class VideoInfo {
     if (!format.index_range || !format.init_range)
       throw new InnertubeError('Index and init ranges not available', { format });
 
-    const url = new URL(format.decipher(this.#player));
+    const url = new URL(format.decipher());
     url.searchParams.set('cpn', this.#cpn);
 
     set.appendChild(this.#el(document, 'Representation', {
@@ -469,7 +469,7 @@ class VideoInfo {
     if (!format.index_range || !format.init_range)
       throw new InnertubeError('Index and init ranges not available', { format });
 
-    const url = new URL(format.decipher(this.#player));
+    const url = new URL(format.decipher());
     url.searchParams.set('cpn', this.#cpn);
 
     set.appendChild(this.#el(document, 'Representation', {
@@ -514,7 +514,7 @@ class VideoInfo {
     };
 
     const format = this.chooseFormat(opts);
-    const format_url = format.decipher(this.#player);
+    const format_url = format.decipher();
 
     // If we're not downloading the video in chunks, we just use fetch once.
     if (opts.type === 'video+audio' && !options.range) {
