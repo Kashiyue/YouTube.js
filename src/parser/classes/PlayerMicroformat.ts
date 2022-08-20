@@ -34,6 +34,11 @@ class PlayerMicroformat extends YTNode {
   publish_date: string;
   upload_date: string;
   available_countries: string[];
+  live_broadcast_details: {
+    isLiveNow: boolean;
+    startTimestamp: boolean;
+    endTimestamp?: boolean;
+  } | undefined;
 
   constructor(data: any) {
     super();
@@ -65,7 +70,7 @@ class PlayerMicroformat extends YTNode {
     this.publish_date = data.publishDate;
     this.upload_date = data.uploadDate;
     this.available_countries = data.availableCountries;
-    if (data.liveBroadcastDetails){
+    if (data.liveBroadcastDetails) {
         this.live_broadcast_details = data.liveBroadcastDetails;
     }
   }
