@@ -36,8 +36,8 @@ class PlayerMicroformat extends YTNode {
   available_countries: string[];
   live_broadcast_details: {
     isLiveNow: boolean;
-    startTimestamp: boolean;
-    endTimestamp?: boolean;
+    startTimestamp: string;
+    endTimestamp?: string;
   } | undefined;
 
   constructor(data: any) {
