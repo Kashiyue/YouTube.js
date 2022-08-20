@@ -52,7 +52,9 @@ class MusicResponsiveListItem extends YTNode {
   }[];
 
   name?: string;
+  subtitle?: Text;
   subscribers?: string;
+  song_count?: string;
   // TODO: these might be replaceable with Author class
   author?: {
     name: string,
@@ -176,7 +178,8 @@ class MusicResponsiveListItem extends YTNode {
       }));
     }
 
-    const duration_text = this.#flex_columns[1].key('title').instanceof(Text).runs?.find((run) => (/^\d+$/).test(run.text.replace(/:/g, '')))?.text;
+    const duration_text = this.#flex_columns[1].key('title').instanceof(Text).runs?.find((run) => (/^\d+$/).test(run.text.replace(/:/g, '')))?.text ||
+      this.#fixed_columns[0]?.key('title').instanceof(Text).runs?.find((run) => (/^\d+$/).test(run.text.replace(/:/g, '')))?.text;
     duration_text && (this.duration = {
       text: duration_text,
       seconds: timeToSeconds(duration_text)
@@ -186,7 +189,9 @@ class MusicResponsiveListItem extends YTNode {
   #parseArtist() {
     this.id = this.endpoint?.browse?.id;
     this.name = this.#flex_columns[0].key('title').instanceof(Text).toString();
-    this.subscribers = this.#flex_columns[1].key('title').instanceof(Text).runs?.[2]?.text || '';
+    this.subtitle = this.#flex_columns[1].key('title').instanceof(Text);
+    this.subscribers = this.subtitle.runs?.find((run) => (/^(\d*\.)?\d+[M|K]? subscribers?$/i).test(run.text))?.text || '';
+    this.song_count = this.subtitle.runs?.find((run) => (/^\d+(,\d+)? songs?$/i).test(run.text))?.text || '';
   }
 
   #parseAlbum() {
