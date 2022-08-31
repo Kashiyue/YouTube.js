@@ -2,6 +2,10 @@
 // See ./scripts/build-parser-json.js
 import { YTNodeConstructor } from './helpers';
 
+import { default as AccountChannel } from './classes/AccountChannel';
+import { default as AccountItemSection } from './classes/AccountItemSection';
+import { default as AccountItemSectionHeader } from './classes/AccountItemSectionHeader';
+import { default as AccountSectionList } from './classes/AccountSectionList';
 import { default as AppendContinuationItemsAction } from './classes/actions/AppendContinuationItemsAction';
 import { default as OpenPopupAction } from './classes/actions/OpenPopupAction';
 import { default as AnalyticsMainAppKeyMetrics } from './classes/analytics/AnalyticsMainAppKeyMetrics';
@@ -11,6 +15,7 @@ import { default as AnalyticsVideo } from './classes/analytics/AnalyticsVideo';
 import { default as AnalyticsVodCarouselCard } from './classes/analytics/AnalyticsVodCarouselCard';
 import { default as CtaGoToCreatorStudio } from './classes/analytics/CtaGoToCreatorStudio';
 import { default as DataModelSection } from './classes/analytics/DataModelSection';
+import { default as StatRow } from './classes/analytics/StatRow';
 import { default as AutomixPreviewVideo } from './classes/AutomixPreviewVideo';
 import { default as BackstageImage } from './classes/BackstageImage';
 import { default as BackstagePost } from './classes/BackstagePost';
@@ -27,6 +32,7 @@ import { default as ChannelFeaturedContent } from './classes/ChannelFeaturedCont
 import { default as ChannelHeaderLinks } from './classes/ChannelHeaderLinks';
 import { default as ChannelMetadata } from './classes/ChannelMetadata';
 import { default as ChannelMobileHeader } from './classes/ChannelMobileHeader';
+import { default as ChannelOptions } from './classes/ChannelOptions';
 import { default as ChannelThumbnailWithLink } from './classes/ChannelThumbnailWithLink';
 import { default as ChannelVideoPlayer } from './classes/ChannelVideoPlayer';
 import { default as ChildVideo } from './classes/ChildVideo';
@@ -47,6 +53,7 @@ import { default as CompactMix } from './classes/CompactMix';
 import { default as CompactPlaylist } from './classes/CompactPlaylist';
 import { default as CompactVideo } from './classes/CompactVideo';
 import { default as ContinuationItem } from './classes/ContinuationItem';
+import { default as CopyLink } from './classes/CopyLink';
 import { default as CreatePlaylistDialog } from './classes/CreatePlaylistDialog';
 import { default as DidYouMean } from './classes/DidYouMean';
 import { default as DownloadButton } from './classes/DownloadButton';
@@ -70,6 +77,7 @@ import { default as GridVideo } from './classes/GridVideo';
 import { default as HistorySuggestion } from './classes/HistorySuggestion';
 import { default as HorizontalCardList } from './classes/HorizontalCardList';
 import { default as HorizontalList } from './classes/HorizontalList';
+import { default as IconLink } from './classes/IconLink';
 import { default as ItemSection } from './classes/ItemSection';
 import { default as ItemSectionHeader } from './classes/ItemSectionHeader';
 import { default as ItemSectionTab } from './classes/ItemSectionTab';
@@ -118,6 +126,9 @@ import { default as MenuServiceItem } from './classes/menus/MenuServiceItem';
 import { default as MenuServiceItemDownload } from './classes/menus/MenuServiceItemDownload';
 import { default as MultiPageMenu } from './classes/menus/MultiPageMenu';
 import { default as MultiPageMenuNotificationSection } from './classes/menus/MultiPageMenuNotificationSection';
+import { default as MusicMenuItemDivider } from './classes/menus/MusicMenuItemDivider';
+import { default as MusicMultiSelectMenu } from './classes/menus/MusicMultiSelectMenu';
+import { default as MusicMultiSelectMenuItem } from './classes/menus/MusicMultiSelectMenuItem';
 import { default as SimpleMenuHeader } from './classes/menus/SimpleMenuHeader';
 import { default as MerchandiseItem } from './classes/MerchandiseItem';
 import { default as MerchandiseShelf } from './classes/MerchandiseShelf';
@@ -147,10 +158,14 @@ import { default as MusicResponsiveListItem } from './classes/MusicResponsiveLis
 import { default as MusicResponsiveListItemFixedColumn } from './classes/MusicResponsiveListItemFixedColumn';
 import { default as MusicResponsiveListItemFlexColumn } from './classes/MusicResponsiveListItemFlexColumn';
 import { default as MusicShelf } from './classes/MusicShelf';
+import { default as MusicSideAlignedItem } from './classes/MusicSideAlignedItem';
+import { default as MusicSortFilterButton } from './classes/MusicSortFilterButton';
 import { default as MusicThumbnail } from './classes/MusicThumbnail';
 import { default as MusicTwoRowItem } from './classes/MusicTwoRowItem';
+import { default as MusicVisualHeader } from './classes/MusicVisualHeader';
 import { default as NavigationEndpoint } from './classes/NavigationEndpoint';
 import { default as Notification } from './classes/Notification';
+import { default as PageIntroduction } from './classes/PageIntroduction';
 import { default as PlayerAnnotationsExpanded } from './classes/PlayerAnnotationsExpanded';
 import { default as PlayerCaptionsTracklist } from './classes/PlayerCaptionsTracklist';
 import { default as PlayerErrorMessage } from './classes/PlayerErrorMessage';
@@ -191,10 +206,16 @@ import { default as SearchSuggestion } from './classes/SearchSuggestion';
 import { default as SearchSuggestionsSection } from './classes/SearchSuggestionsSection';
 import { default as SecondarySearchContainer } from './classes/SecondarySearchContainer';
 import { default as SectionList } from './classes/SectionList';
+import { default as SettingBoolean } from './classes/SettingBoolean';
+import { default as SettingsCheckbox } from './classes/SettingsCheckbox';
+import { default as SettingsOptions } from './classes/SettingsOptions';
+import { default as SettingsSidebar } from './classes/SettingsSidebar';
+import { default as SettingsSwitch } from './classes/SettingsSwitch';
 import { default as Shelf } from './classes/Shelf';
 import { default as ShowingResultsFor } from './classes/ShowingResultsFor';
 import { default as SimpleCardContent } from './classes/SimpleCardContent';
 import { default as SimpleCardTeaser } from './classes/SimpleCardTeaser';
+import { default as SimpleTextSection } from './classes/SimpleTextSection';
 import { default as SingleActionEmergencySupport } from './classes/SingleActionEmergencySupport';
 import { default as SingleColumnBrowseResults } from './classes/SingleColumnBrowseResults';
 import { default as SingleColumnMusicWatchNextResults } from './classes/SingleColumnMusicWatchNextResults';
@@ -242,6 +263,10 @@ import { default as WatchNextEndScreen } from './classes/WatchNextEndScreen';
 import { default as WatchNextTabbedResults } from './classes/WatchNextTabbedResults';
 
 const map: Record<string, YTNodeConstructor> = {
+  AccountChannel,
+  AccountItemSection,
+  AccountItemSectionHeader,
+  AccountSectionList,
   AppendContinuationItemsAction,
   OpenPopupAction,
   AnalyticsMainAppKeyMetrics,
@@ -251,6 +276,7 @@ const map: Record<string, YTNodeConstructor> = {
   AnalyticsVodCarouselCard,
   CtaGoToCreatorStudio,
   DataModelSection,
+  StatRow,
   AutomixPreviewVideo,
   BackstageImage,
   BackstagePost,
@@ -267,6 +293,7 @@ const map: Record<string, YTNodeConstructor> = {
   ChannelHeaderLinks,
   ChannelMetadata,
   ChannelMobileHeader,
+  ChannelOptions,
   ChannelThumbnailWithLink,
   ChannelVideoPlayer,
   ChildVideo,
@@ -287,6 +314,7 @@ const map: Record<string, YTNodeConstructor> = {
   CompactPlaylist,
   CompactVideo,
   ContinuationItem,
+  CopyLink,
   CreatePlaylistDialog,
   DidYouMean,
   DownloadButton,
@@ -310,6 +338,7 @@ const map: Record<string, YTNodeConstructor> = {
   HistorySuggestion,
   HorizontalCardList,
   HorizontalList,
+  IconLink,
   ItemSection,
   ItemSectionHeader,
   ItemSectionTab,
@@ -358,6 +387,9 @@ const map: Record<string, YTNodeConstructor> = {
   MenuServiceItemDownload,
   MultiPageMenu,
   MultiPageMenuNotificationSection,
+  MusicMenuItemDivider,
+  MusicMultiSelectMenu,
+  MusicMultiSelectMenuItem,
   SimpleMenuHeader,
   MerchandiseItem,
   MerchandiseShelf,
@@ -387,10 +419,14 @@ const map: Record<string, YTNodeConstructor> = {
   MusicResponsiveListItemFixedColumn,
   MusicResponsiveListItemFlexColumn,
   MusicShelf,
+  MusicSideAlignedItem,
+  MusicSortFilterButton,
   MusicThumbnail,
   MusicTwoRowItem,
+  MusicVisualHeader,
   NavigationEndpoint,
   Notification,
+  PageIntroduction,
   PlayerAnnotationsExpanded,
   PlayerCaptionsTracklist,
   PlayerErrorMessage,
@@ -431,10 +467,16 @@ const map: Record<string, YTNodeConstructor> = {
   SearchSuggestionsSection,
   SecondarySearchContainer,
   SectionList,
+  SettingBoolean,
+  SettingsCheckbox,
+  SettingsOptions,
+  SettingsSidebar,
+  SettingsSwitch,
   Shelf,
   ShowingResultsFor,
   SimpleCardContent,
   SimpleCardTeaser,
+  SimpleTextSection,
   SingleActionEmergencySupport,
   SingleColumnBrowseResults,
   SingleColumnMusicWatchNextResults,

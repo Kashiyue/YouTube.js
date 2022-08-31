@@ -6,9 +6,10 @@ import Parser, { ParsedResponse } from '../parser/index';
 import { hasKeys, InnertubeError, MissingParamError, uuidv4 } from '../utils/Utils';
 
 export interface BrowseArgs {
-  params?: string;
+  params?: string | null;
   is_ytm?: boolean;
   is_ctoken?: boolean;
+  form_data?: {};
   client?: string;
 }
 
@@ -92,6 +93,10 @@ class Actions {
       data.continuation = id;
     } else {
       data.browseId = id;
+    }
+
+    if (args.form_data) {
+      data.formData = args.form_data;
     }
 
     if (args.client) {
@@ -689,6 +694,11 @@ class Actions {
     if (!args.protobuf) {
       data = { ...args };
 
+      if (Reflect.has(data, 'browseId')) {
+        if (this.#needsLogin(data.browseId) && !this.#session.logged_in)
+          throw new InnertubeError('You are not signed in');
+      }
+
       if (Reflect.has(data, 'parse'))
         delete data.parse;
 
@@ -698,9 +708,17 @@ class Actions {
       if (Reflect.has(data, 'clientActions'))
         delete data.clientActions;
 
+      if (Reflect.has(data, 'settingItemIdForClient'))
+        delete data.settingItemIdForClient;
+
       if (Reflect.has(data, 'action')) {
         data.actions = [ data.action ];
         delete data.action;
+      }
+
+      if (Reflect.has(data, 'boolValue')) {
+        data.newValue = { boolValue: data.boolValue };
+        delete data.boolValue;
       }
 
       if (Reflect.has(data, 'token')) {

@@ -1,4 +1,3 @@
-import Flatten from 'flat';
 import package_json from '../../package.json';
 import { FetchFunction } from './HTTPClient';
 import userAgents from './user-agents.json';
@@ -30,24 +29,6 @@ export class NoStreamingDataError extends InnertubeError { }
 export class OAuthError extends InnertubeError { }
 export class PlayerError extends Error { }
 export class SessionError extends Error { }
-
-/**
- * Utility to help access deep properties of an object.
- * @param obj - the object.
- * @param key - key of the property being accessed.
- * @param target - anything that might be inside of the property.
- * @param depth - maximum number of nested objects to flatten.
- * @param safe - if set to true arrays will be preserved.
- */
-export function findNode(obj: any, key: string, target: string, depth: number, safe = true): any | any[] {
-  const flat_obj = Flatten(obj, { safe, maxDepth: depth || 2 }) as any;
-  const result = Object.keys(flat_obj).find((entry) => entry.includes(key) && JSON.stringify(flat_obj[entry] || '{}').includes(target));
-  if (!result)
-    throw new ParsingError(`Expected to find "${key}" with content "${target}" but got ${result}`, {
-      key, target, data_snippet: `${JSON.stringify(flat_obj, null, 4).slice(0, 300)}..`
-    });
-  return flat_obj[result];
-}
 
 /**
  * Compares given objects. May not work correctly for
@@ -203,19 +184,6 @@ export function hasKeys<T extends object, R extends (keyof T)[]>(params: T, ...k
       return false;
   }
   return true;
-}
-
-/**
- * Turns the ntoken transform data into a valid json array
- */
-export function refineNTokenData(data: string) {
-  return data
-    .replace(/function\(d,e\)/g, '"function(d,e)').replace(/function\(d\)/g, '"function(d)')
-    .replace(/function\(\)/g, '"function()').replace(/function\(d,e,f\)/g, '"function(d,e,f)')
-    .replace(/\[function\(d,e,f\)/g, '["function(d,e,f)').replace(/,b,/g, ',"b",')
-    .replace(/,b/g, ',"b"').replace(/b,/g, '"b",').replace(/b]/g, '"b"]')
-    .replace(/\[b/g, '["b"').replace(/}]/g, '"]').replace(/},/g, '}",')
-    .replace(/""/g, '').replace(/length]\)}"/g, 'length])}');
 }
 
 export function uuidv4() {
