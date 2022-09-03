@@ -96,10 +96,10 @@ class VideoInfo {
     const info = Parser.parseResponse(data[0].data);
     const next = data?.[1]?.data ? Parser.parseResponse(data[1].data) : undefined;
 
-    this.#page = [info, next];
-    
+    this.#page = [ info, next ];
+
     if (!info.microformat?.is(PlayerMicroformat))
-    throw new InnertubeError('Invalid microformat', info.microformat);
+      throw new InnertubeError('Invalid microformat', info.microformat);
 
     if (info.playability_status?.status === 'ERROR')
       throw new InnertubeError('This video is unavailable', info.playability_status);

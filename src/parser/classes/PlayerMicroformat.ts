@@ -71,7 +71,7 @@ class PlayerMicroformat extends YTNode {
     this.upload_date = data.uploadDate;
     this.available_countries = data.availableCountries;
     if (data.liveBroadcastDetails) {
-        this.live_broadcast_details = data.liveBroadcastDetails;
+      this.live_broadcast_details = data.liveBroadcastDetails;
     }
   }
 }
