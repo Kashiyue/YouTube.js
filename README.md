@@ -6,7 +6,6 @@
 [codefactor]: https://www.codefactor.io/repository/github/luanrt/youtube.js
 [actions]: https://github.com/LuanRT/YouTube.js/actions
 [say-thanks]: https://saythanks.io/to/LuanRT
-[ko-fi]:https://ko-fi.com/luanrt
 [github-sponsors]:https://github.com/sponsors/LuanRT
 
 <!-- OTHER LINKS -->
@@ -93,7 +92,7 @@ ___
       <ul>
         <li><a href="#browser-usage">Browser Usage</a></li>
         <li><a href="#caching">Caching</a></li>
-        <li><a href="#caching">API</a></li>
+        <li><a href="#api">API</a></li>
       </ul>
     </li>
     <li><a href="#implementing-custom-functionality">Implementing custom functionality </a></li>
@@ -338,7 +337,7 @@ Retrieves video info, including playback data and even layout elements such as m
 </details> 
 
 <a name="getbasicinfo"></a>
-### getBasicInfo(video_id)
+### getBasicInfo(video_id, client?)
 
 Suitable for cases where you only need basic video metadata. Also, it is faster than [`getInfo()`](#getinfo).
 
@@ -606,7 +605,7 @@ If you're working on an extension for the library or just want to have nicely ty
 ```ts
 // See ./examples/parser
 
-import Parser from 'youtubei.js/dist/src/parser';
+import { Parser } from 'youtubei.js';
 
 import SectionList from 'youtubei.js/dist/src/parser/classes/SectionList';
 import SingleColumnBrowseResults from 'youtubei.js/dist/src/parser/classes/SingleColumnBrowseResults';
@@ -640,7 +639,7 @@ if (!tab)
 if (!tab.content)
   throw new Error('Target tab appears to be empty');
   
-const sections = tab.content?.as(SectionList).contents.array().as(MusicCarouselShelf, MusicShelf);
+const sections = tab.content?.as(SectionList).contents.array().as(MusicCarouselShelf, MusicDescriptionShelf, MusicShelf);
 
 console.info('Sections:', sections);
 ```
