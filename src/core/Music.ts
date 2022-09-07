@@ -9,6 +9,7 @@ import Library from '../parser/ytmusic/Library';
 import Artist from '../parser/ytmusic/Artist';
 import Album from '../parser/ytmusic/Album';
 import Playlist from '../parser/ytmusic/Playlist';
+import Recap from '../parser/ytmusic/Recap';
 
 import Parser from '../parser/index';
 import { observe, YTNode } from '../parser/helpers';
@@ -45,7 +46,7 @@ class Music {
     const continuation = this.#actions.execute('/next', { client: 'YTMUSIC', videoId: video_id });
 
     const response = await Promise.all([ initial_info, continuation ]);
-    return new TrackInfo(response, this.#actions);
+    return new TrackInfo(response, this.#actions, cpn);
   }
 
   /**
@@ -89,7 +90,7 @@ class Music {
   async getArtist(artist_id: string) {
     throwIfMissing({ artist_id });
 
-    if (!artist_id.startsWith('UC'))
+    if (!artist_id.startsWith('UC') && !artist_id.startsWith('FEmusic_library_privately_owned_artist'))
       throw new InnertubeError('Invalid artist id', artist_id);
 
     const response = await this.#actions.browse(artist_id, { client: 'YTMUSIC' });
@@ -118,6 +119,7 @@ class Music {
     if (!playlist_id.startsWith('VL')) {
       playlist_id = `VL${playlist_id}`;
     }
+
     const response = await this.#actions.browse(playlist_id, { client: 'YTMUSIC' });
     return new Playlist(response, this.#actions);
   }
@@ -220,6 +222,15 @@ class Music {
     const shelves = page.contents.item().as(SectionList).contents.array().as(MusicCarouselShelf, MusicDescriptionShelf);
 
     return shelves;
+  }
+
+  async getRecap() {
+    const response = await this.#actions.execute('/browse', {
+      browseId: 'FEmusic_listening_review',
+      client: 'YTMUSIC_ANDROID'
+    });
+
+    return new Recap(response, this.#actions);
   }
 
   /**
