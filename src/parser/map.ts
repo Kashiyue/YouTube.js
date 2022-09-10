@@ -38,6 +38,7 @@ import { default as ChannelVideoPlayer } from './classes/ChannelVideoPlayer';
 import { default as ChildVideo } from './classes/ChildVideo';
 import { default as ChipCloud } from './classes/ChipCloud';
 import { default as ChipCloudChip } from './classes/ChipCloudChip';
+import { default as CollaboratorInfoCardContent } from './classes/CollaboratorInfoCardContent';
 import { default as CollageHeroImage } from './classes/CollageHeroImage';
 import { default as AuthorCommentBadge } from './classes/comments/AuthorCommentBadge';
 import { default as Comment } from './classes/comments/Comment';
@@ -88,6 +89,7 @@ import { default as LiveChat } from './classes/LiveChat';
 import { default as AddBannerToLiveChatCommand } from './classes/livechat/AddBannerToLiveChatCommand';
 import { default as AddChatItemAction } from './classes/livechat/AddChatItemAction';
 import { default as AddLiveChatTickerItemAction } from './classes/livechat/AddLiveChatTickerItemAction';
+import { default as LiveChatAutoModMessage } from './classes/livechat/items/LiveChatAutoModMessage';
 import { default as LiveChatBanner } from './classes/livechat/items/LiveChatBanner';
 import { default as LiveChatBannerHeader } from './classes/livechat/items/LiveChatBannerHeader';
 import { default as LiveChatBannerPoll } from './classes/livechat/items/LiveChatBannerPoll';
@@ -116,6 +118,7 @@ import { default as UpdateTitleAction } from './classes/livechat/UpdateTitleActi
 import { default as UpdateToggleButtonTextAction } from './classes/livechat/UpdateToggleButtonTextAction';
 import { default as UpdateViewershipAction } from './classes/livechat/UpdateViewershipAction';
 import { default as LiveChatAuthorBadge } from './classes/LiveChatAuthorBadge';
+import { default as LiveChatDialog } from './classes/LiveChatDialog';
 import { default as LiveChatHeader } from './classes/LiveChatHeader';
 import { default as LiveChatItemList } from './classes/LiveChatItemList';
 import { default as LiveChatMessageInput } from './classes/LiveChatMessageInput';
@@ -183,6 +186,7 @@ import { default as PlaylistInfoCardContent } from './classes/PlaylistInfoCardCo
 import { default as PlaylistMetadata } from './classes/PlaylistMetadata';
 import { default as PlaylistPanel } from './classes/PlaylistPanel';
 import { default as PlaylistPanelVideo } from './classes/PlaylistPanelVideo';
+import { default as PlaylistPanelVideoWrapper } from './classes/PlaylistPanelVideoWrapper';
 import { default as PlaylistSidebar } from './classes/PlaylistSidebar';
 import { default as PlaylistSidebarPrimaryInfo } from './classes/PlaylistSidebarPrimaryInfo';
 import { default as PlaylistSidebarSecondaryInfo } from './classes/PlaylistSidebarSecondaryInfo';
@@ -209,6 +213,7 @@ import { default as SearchSuggestion } from './classes/SearchSuggestion';
 import { default as SearchSuggestionsSection } from './classes/SearchSuggestionsSection';
 import { default as SecondarySearchContainer } from './classes/SecondarySearchContainer';
 import { default as SectionList } from './classes/SectionList';
+import { default as SegmentedLikeDislikeButton } from './classes/SegmentedLikeDislikeButton';
 import { default as SettingBoolean } from './classes/SettingBoolean';
 import { default as SettingsCheckbox } from './classes/SettingsCheckbox';
 import { default as SettingsOptions } from './classes/SettingsOptions';
@@ -303,6 +308,7 @@ const map: Record<string, YTNodeConstructor> = {
   ChildVideo,
   ChipCloud,
   ChipCloudChip,
+  CollaboratorInfoCardContent,
   CollageHeroImage,
   AuthorCommentBadge,
   Comment,
@@ -353,6 +359,7 @@ const map: Record<string, YTNodeConstructor> = {
   AddBannerToLiveChatCommand,
   AddChatItemAction,
   AddLiveChatTickerItemAction,
+  LiveChatAutoModMessage,
   LiveChatBanner,
   LiveChatBannerHeader,
   LiveChatBannerPoll,
@@ -381,6 +388,7 @@ const map: Record<string, YTNodeConstructor> = {
   UpdateToggleButtonTextAction,
   UpdateViewershipAction,
   LiveChatAuthorBadge,
+  LiveChatDialog,
   LiveChatHeader,
   LiveChatItemList,
   LiveChatMessageInput,
@@ -448,6 +456,7 @@ const map: Record<string, YTNodeConstructor> = {
   PlaylistMetadata,
   PlaylistPanel,
   PlaylistPanelVideo,
+  PlaylistPanelVideoWrapper,
   PlaylistSidebar,
   PlaylistSidebarPrimaryInfo,
   PlaylistSidebarSecondaryInfo,
@@ -474,6 +483,7 @@ const map: Record<string, YTNodeConstructor> = {
   SearchSuggestionsSection,
   SecondarySearchContainer,
   SectionList,
+  SegmentedLikeDislikeButton,
   SettingBoolean,
   SettingsCheckbox,
   SettingsOptions,
