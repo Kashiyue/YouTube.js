@@ -1,6 +1,6 @@
 {
   "name": "youtubei.js",
-  "version": "2.2.1",
+  "version": "2.3.3",
   "description": "Full-featured wrapper around YouTube's private API.",
   "main": "./dist/index.js",
   "browser": "./bundle/browser.js",
@@ -12,7 +12,8 @@
   "contributors": [
     "Wykerd (https://github.com/wykerd/)",
     "MasterOfBob777 (https://github.com/MasterOfBob777)",
-    "patrickkfkan (https://github.com/patrickkfkan)"
+    "patrickkfkan (https://github.com/patrickkfkan)",
+    "akkadaska (https://github.com/akkadaska)"
   ],
   "directories": {
     "test": "./test",
@@ -39,7 +40,7 @@
   "license": "MIT",
   "dependencies": {
     "@protobuf-ts/runtime": "^2.7.0",
-    "jintr": "^0.2.0",
+    "jintr": "^0.3.1",
     "linkedom": "^0.14.12",
     "undici": "^5.7.0"
   },

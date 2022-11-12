@@ -149,9 +149,35 @@ Retrieves “Explore” feed.
 
 Retrieves library.
 
-**Returns:** `Promise.<Library>`
+**Returns:** `Library`
 
-<!-- TODO: document Library's methods and getters. -->
+<details>
+<summary>Methods & Getters</summary>
+<p>
+
+- `<library>#applyFilter(filter)`
+  - Applies given filter to the library.
+
+- `<library>#applySortFilter(filter)`
+  - Applies given sort filter to the library items.
+
+- `<library>#getContinuation()`
+  - Retrieves continuation of the library items.
+
+- `<library>#has_continuation`
+  - Checks if continuation is available.
+
+- `<library>#filters`
+  - Returns available filters.
+
+- `<library>#sort_filters`
+  - Returns available sort filters.
+
+- `<library>#page`
+  - Returns original InnerTube response (sanitized).
+
+</p>
+</details> 
 
 <a name="getartist"></a>
 ### getArtist(artist_id)

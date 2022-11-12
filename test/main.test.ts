@@ -10,29 +10,54 @@ describe('YouTube.js Tests', () => {
     yt = await Innertube.create();
   });
   
+  describe('Info', () => {
+    let info: any;
+    
+    it('should retrieve full video info', async () => {
+      info = await yt.getInfo(VIDEOS[0].ID);
+      expect(info.basic_info.id).toBe(VIDEOS[0].ID);
+    });
+
+    it('should have captions on full video info', async () => {
+      expect(info.captions?.caption_tracks.length).toBeGreaterThan(0);
+    });
+
+    it('should retrieve basic video info', async () => {
+      const b_info = await yt.getBasicInfo(VIDEOS[0].ID);
+      expect(b_info.basic_info.id).toBe(VIDEOS[0].ID);
+    });
+  });
+  
   describe('Search', () => {
+    let search: any;
+    
     it('should search', async () => {
-      const search = await yt.search(VIDEOS[0].QUERY);
-      expect(search.results?.length).toBeLessThanOrEqual(35);
-      expect(search.videos.length).toBeLessThanOrEqual(35);
-      expect(search.playlists.length).toBeLessThanOrEqual(35);
-      expect(search.channels.length).toBeLessThanOrEqual(35);
+      search = await yt.search(VIDEOS[0].QUERY);
+      expect(search.results.length).toBeGreaterThanOrEqual(5);
+      expect(search.playlists).toBeDefined();
+      expect(search.channels).toBeDefined();
+      expect(search.has_continuation).toBe(true);
+    });
+
+    it('should search with WatchCardHeroVideo parse', async () => {
+      search = await yt.search(VIDEOS[2].QUERY);
+      expect(search.results.length).toBeGreaterThanOrEqual(5);
+      expect(search.playlists).toBeDefined();
+      expect(search.channels).toBeDefined();
       expect(search.has_continuation).toBe(true);
     });
     
     it('should retrieve search continuation', async () => {
-      const search = await yt.search(VIDEOS[0].QUERY);
-      const next = await search.getContinuation()
-      expect(next.results?.length).toBeLessThanOrEqual(35);
-      expect(next.videos.length).toBeLessThanOrEqual(35);
-      expect(next.playlists.length).toBeLessThanOrEqual(35);
-      expect(next.channels.length).toBeLessThanOrEqual(35);
-      expect(next.has_continuation).toBe(true);
+      const next = await search.getContinuation();
+      expect(next.results.length).toBeGreaterThanOrEqual(5);
+      expect(search.playlists).toBeDefined();
+      expect(search.channels).toBeDefined();
+      expect(search.has_continuation).toBe(true);
     });
     
     it('should retrieve search suggestions', async () => {
       const suggestions = await yt.getSearchSuggestions(VIDEOS[0].QUERY);
-      expect(suggestions.length).toBeLessThanOrEqual(10);
+      expect(suggestions.length).toBeGreaterThanOrEqual(1);
     });
   });
   
@@ -58,23 +83,6 @@ describe('YouTube.js Tests', () => {
       expect(thread.replies.length).toBeLessThanOrEqual(10);
     });
   });
-
-  describe('Info', () => {
-    it('should retrieve full video info', async () => {
-      const info = await yt.getInfo(VIDEOS[0].ID);
-      expect(info.basic_info.id).toBe(VIDEOS[0].ID);
-    });
-
-    it('should have captions on full video info', async () => {
-      const info = await yt.getInfo(VIDEOS[0].ID);
-      expect(info.captions?.caption_tracks.length).toBeGreaterThan(0);
-    });
-
-    it('should retrieve basic video info', async () => {
-      const info = await yt.getBasicInfo(VIDEOS[0].ID);
-      expect(info.basic_info.id).toBe(VIDEOS[0].ID);
-    });
-  });
   
   describe('General', () => {
     it('should retrieve playlist', async () => {
@@ -84,6 +92,8 @@ describe('YouTube.js Tests', () => {
     
     it('should retrieve home feed', async () => {
       const homefeed = await yt.getHomeFeed();
+      expect(homefeed.header).toBeDefined();
+      expect(homefeed.contents).toBeDefined();
       expect(homefeed.videos.length).toBeGreaterThan(0);
     });
     

@@ -13,7 +13,7 @@ class FilterableFeed extends Feed {
   }
 
   /**
-   * Get filters for the feed
+   * Returns the filter chips.
    */
   get filter_chips() {
     if (this.#chips)
@@ -30,6 +30,9 @@ class FilterableFeed extends Feed {
     return this.#chips || [];
   }
 
+  /**
+   * Returns available filters.
+   */
   get filters() {
     return this.filter_chips.map((chip) => chip.text.toString()) || [];
   }
@@ -42,9 +45,7 @@ class FilterableFeed extends Feed {
 
     if (typeof filter === 'string') {
       if (!this.filters.includes(filter))
-        throw new InnertubeError('Filter not found', {
-          available_filters: this.filters
-        });
+        throw new InnertubeError('Filter not found', { available_filters: this.filters });
       target_filter = this.filter_chips.find((chip) => chip.text.toString() === filter);
     } else if (filter.type === 'ChipCloudChip') {
       target_filter = filter;
@@ -54,10 +55,12 @@ class FilterableFeed extends Feed {
 
     if (!target_filter)
       throw new InnertubeError('Filter not found');
+
     if (target_filter.is_selected)
       return this;
 
-    const response = await target_filter.endpoint?.call(this.actions, undefined, true);
+    const response = await target_filter.endpoint?.call(this.actions, { parse: true });
+
     return new Feed(this.actions, response, true);
   }
 }

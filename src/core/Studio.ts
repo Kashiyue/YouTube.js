@@ -1,15 +1,15 @@
 import Proto from '../proto';
 import Session from './Session';
-import { AxioslikeResponse } from './Actions';
+import { ApiResponse } from './Actions';
 import { InnertubeError, MissingParamError, uuidv4 } from '../utils/Utils';
 import { Constants } from '../utils';
 
-export interface UploadResult {
+interface UploadResult {
   status: string;
   scottyResourceId: string;
 }
 
-export interface InitialUploadData {
+interface InitialUploadData {
   frontend_upload_id: string;
   upload_id: string;
   upload_url: string;
@@ -18,6 +18,17 @@ export interface InitialUploadData {
 }
 
 export interface VideoMetadata {
+  title?: string;
+  description?: string;
+  tags?: string[];
+  category?: number;
+  license?: string;
+  age_restricted?: boolean;
+  made_for_kids?: boolean;
+  privacy?: 'PUBLIC' | 'PRIVATE' | 'UNLISTED';
+}
+
+export interface UploadedVideoMetadata {
   title?: string;
   description?: string;
   privacy?: 'PUBLIC' | 'PRIVATE' | 'UNLISTED';
@@ -39,11 +50,42 @@ class Studio {
    * const response = await yt.studio.setThumbnail(video_id, buffer);
    * ```
    */
-  async setThumbnail(video_id: string, buffer: Uint8Array): Promise<AxioslikeResponse> {
+  async setThumbnail(video_id: string, buffer: Uint8Array): Promise<ApiResponse> {
+    if (!this.#session.logged_in)
+      throw new InnertubeError('You are not signed in');
+
     if (!video_id || !buffer)
       throw new MissingParamError('One or more parameters are missing.');
 
     const payload = Proto.encodeCustomThumbnailPayload(video_id, buffer);
+
+    const response = await this.#session.actions.execute('/video_manager/metadata_update', {
+      protobuf: true,
+      serialized_data: payload
+    });
+
+    return response;
+  }
+
+  /**
+   * Updates given video's metadata.
+   * @example
+   * ```ts
+   * const response = await yt.studio.updateVideoMetadata('videoid', {
+   *   tags: [ 'astronomy', 'NASA', 'APOD' ],
+   *   title: 'Artemis Mission',
+   *   description: 'A nicely written description...',
+   *   category: 27,
+   *   license: 'creative_commons'
+   *   // ...
+   * });
+   * ```
+   */
+  async updateVideoMetadata(video_id: string, metadata: VideoMetadata) {
+    if (!this.#session.logged_in)
+      throw new InnertubeError('You are not signed in');
+
+    const payload = Proto.encodeVideoMetadataPayload(video_id, metadata);
 
     const response = await this.#session.actions.execute('/video_manager/metadata_update', {
       protobuf: true,
@@ -61,7 +103,10 @@ class Studio {
    * const response = await yt.studio.upload(file.buffer, { title: 'Wow!' });
    * ```
    */
-  async upload(file: BodyInit, metadata: VideoMetadata = {}): Promise<AxioslikeResponse> {
+  async upload(file: BodyInit, metadata: UploadedVideoMetadata = {}): Promise<ApiResponse> {
+    if (!this.#session.logged_in)
+      throw new InnertubeError('You are not signed in');
+
     const initial_data = await this.#getInitialUploadData();
     const upload_result = await this.#uploadVideo(initial_data.upload_url, file);
 
@@ -128,7 +173,7 @@ class Studio {
     return data;
   }
 
-  async #setVideoMetadata(initial_data: InitialUploadData, upload_result: UploadResult, metadata: VideoMetadata) {
+  async #setVideoMetadata(initial_data: InitialUploadData, upload_result: UploadResult, metadata: UploadedVideoMetadata) {
     const metadata_payload = {
       resourceId: {
         scottyResourceId: {

@@ -1,12 +1,11 @@
 import Player from './Player';
-import Proto from '../proto/index';
 import Actions from './Actions';
 import Constants from '../utils/Constants';
 import UniversalCache from '../utils/Cache';
 import EventEmitterLike from '../utils/EventEmitterLike';
 
 import HTTPClient, { FetchFunction } from '../utils/HTTPClient';
-import { DeviceCategory, generateRandomString, getRandomUserAgent, InnertubeError, SessionError } from '../utils/Utils';
+import { DeviceCategory, getRandomUserAgent, InnertubeError, SessionError } from '../utils/Utils';
 import OAuth, { Credentials, OAuthAuthErrorEventHandler, OAuthAuthEventHandler, OAuthAuthPendingEventHandler } from './OAuth';
 
 export enum ClientType {
@@ -42,6 +41,9 @@ export interface Context {
   };
   user: {
     lockedSafetyMode: false;
+  };
+  thirdParty?: {
+    embedUrl: string;
   };
   request: {
     useSsl: true;
@@ -137,16 +139,12 @@ export default class Session extends EventEmitterLike {
 
     const [ [ device_info ], api_key ] = ytcfg;
 
-    const id = generateRandomString(11);
-    const timestamp = Math.floor(Date.now() / 1000);
-    const visitor_data = Proto.encodeVisitorData(id, timestamp);
-
     const context: Context = {
       client: {
         hl: device_info[0],
         gl: device_info[2],
         remoteHost: device_info[3],
-        visitorData: visitor_data,
+        visitorData: device_info[13],
         userAgent: device_info[14],
         clientName: client_name,
         clientVersion: device_info[16],
@@ -158,7 +156,7 @@ export default class Session extends EventEmitterLike {
         timeZone: device_info[79],
         browserName: device_info[86],
         browserVersion: device_info[87],
-        originalUrl: Constants.URLS.API.BASE,
+        originalUrl: Constants.URLS.YT_BASE,
         deviceMake: device_info[11],
         deviceModel: device_info[12],
         utcOffsetMinutes: new Date().getTimezoneOffset()

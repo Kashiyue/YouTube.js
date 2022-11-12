@@ -50,7 +50,9 @@ export class SectionListContinuation extends YTNode {
   constructor(data: any) {
     super();
     this.contents = Parser.parse(data.contents, true);
-    this.continuation = data.continuations?.[0].nextContinuationData.continuation || null;
+    this.continuation =
+      data.continuations?.[0]?.nextContinuationData?.continuation ||
+      data.continuations?.[0]?.reloadContinuationData?.continuation || null;
   }
 }
 
@@ -170,8 +172,16 @@ export class LiveChatContinuation extends YTNode {
   }
 }
 
+export type ParserError = { classname: string, classdata: any, err: any };
+export type ParserErrorHandler = (error: ParserError) => void;
+
 export default class Parser {
+  static #errorHandler: ParserErrorHandler = Parser.#printError;
   static #memo: Memo | null = null;
+
+  static setParserErrorHandler(handler: ParserErrorHandler) {
+    this.#errorHandler = handler;
+  }
 
   static #clearMemo() {
     Parser.#memo = null;
@@ -203,11 +213,11 @@ export default class Parser {
    */
   static parseResponse(data: any) {
     // Memoize the response objects by classname
+
     this.#createMemo();
     // TODO: is this parseItem?
     const contents = Parser.parse(data.contents);
     const contents_memo = this.#getMemo();
-    // End of memoization
     this.#clearMemo();
 
     this.#createMemo();
@@ -230,6 +240,24 @@ export default class Parser {
     const actions_memo = this.#getMemo();
     this.#clearMemo();
 
+    this.#createMemo();
+    const live_chat_item_context_menu_supported_renderers = data.liveChatItemContextMenuSupportedRenderers
+      ? Parser.parseItem(data.liveChatItemContextMenuSupportedRenderers)
+      : null;
+    const live_chat_item_context_menu_supported_renderers_memo = this.#getMemo();
+    this.#clearMemo();
+
+    this.#createMemo();
+    const header = data.header ? Parser.parse(data.header) : null;
+    const header_memo = this.#getMemo();
+    this.#clearMemo();
+
+    this.#createMemo();
+    const sidebar = data.sidebar ? Parser.parseItem(data.sidebar) : null;
+    const sidebar_memo = this.#getMemo();
+    this.#clearMemo();
+
+
     this.applyMutations(contents_memo, data.frameworkUpdates?.entityBatchUpdate?.mutations);
 
     return {
@@ -237,6 +265,12 @@ export default class Parser {
       actions_memo,
       contents,
       contents_memo,
+      header,
+      header_memo,
+      sidebar,
+      sidebar_memo,
+      live_chat_item_context_menu_supported_renderers,
+      live_chat_item_context_menu_supported_renderers_memo,
       on_response_received_actions,
       on_response_received_actions_memo,
       on_response_received_endpoints,
@@ -246,9 +280,7 @@ export default class Parser {
       continuation: data.continuation ? Parser.parseC(data.continuation) : null,
       continuation_contents: data.continuationContents ? Parser.parseLC(data.continuationContents) : null,
       metadata: Parser.parse(data.metadata),
-      header: Parser.parse(data.header),
       microformat: data.microformat ? Parser.parseItem(data.microformat) : null,
-      sidebar: Parser.parseItem(data.sidebar),
       overlay: Parser.parseItem(data.overlay),
       refinements: data.refinements || null,
       estimated_results: data.estimatedResults ? parseInt(data.estimatedResults) : null,
@@ -269,7 +301,7 @@ export default class Parser {
         formats: Parser.parseFormats(data.streamingData.formats),
         adaptive_formats: Parser.parseFormats(data.streamingData.adaptiveFormats),
         dash_manifest_url: data.streamingData?.dashManifestUrl || null,
-        dls_manifest_url: data.streamingData?.dashManifestUrl || null
+        hls_manifest_url: data.streamingData?.hlsManifestUrl || null
       } : undefined,
       current_video_endpoint: data.currentVideoEndpoint ? new NavigationEndpoint(data.currentVideoEndpoint) : null,
       captions: Parser.parseItem<PlayerCaptionsTracklist>(data.captions, PlayerCaptionsTracklist),
@@ -325,9 +357,13 @@ export default class Parser {
   }
 
   static parseItem<T extends YTNode = YTNode>(data: any, validTypes?: YTNodeConstructor<T> | YTNodeConstructor<T>[]) {
-    if (!data) return null;
+    if (!data ) return null;
 
     const keys = Object.keys(data);
+
+    if (!keys.length)
+      return null;
+
     const classname = this.sanitizeClassName(keys[0]);
 
     if (!this.shouldIgnore(classname)) {
@@ -347,7 +383,7 @@ export default class Parser {
 
         return result as T;
       } catch (err) {
-        this.formatError({ classname, classdata: data[keys[0]], err });
+        this.#errorHandler({ classname, classdata: data[keys[0]], err });
         return null;
       }
     }
@@ -373,8 +409,8 @@ export default class Parser {
     throw new ParsingError('Expected array but got a single item');
   }
 
-  static parse<T extends YTNode = YTNode>(data: any, requireArray: true, validTypes?: YTNodeConstructor<T> | YTNodeConstructor<T>[]) : ObservedArray<T> | null;
-  static parse<T extends YTNode = YTNode>(data: any, requireArray?: false | undefined, validTypes?: YTNodeConstructor<T> | YTNodeConstructor<T>[]) : SuperParsedResult<T>;
+  static parse<T extends YTNode = YTNode>(data: any, requireArray: true, validTypes?: YTNodeConstructor<T> | YTNodeConstructor<T>[]): ObservedArray<T> | null;
+  static parse<T extends YTNode = YTNode>(data: any, requireArray?: false | undefined, validTypes?: YTNodeConstructor<T> | YTNodeConstructor<T>[]): SuperParsedResult<T>;
   static parse<T extends YTNode = YTNode>(data: any, requireArray?: boolean, validTypes?: YTNodeConstructor<T> | YTNodeConstructor<T>[]) {
     if (!data) return null;
 
@@ -400,8 +436,9 @@ export default class Parser {
 
   static applyMutations(memo: Memo, mutations: Array<any>) {
     // Apply mutations to MusicMultiSelectMenuItems
-    const musicMultiSelectMenuItems = memo.getType(MusicMultiSelectMenuItem);
-    if (musicMultiSelectMenuItems.length > 0 && !mutations) {
+    const music_multi_select_menu_items = memo.getType(MusicMultiSelectMenuItem);
+
+    if (music_multi_select_menu_items.length > 0 && !mutations) {
       console.warn(
         new InnertubeError(
           'Mutation data required for processing MusicMultiSelectMenuItems, but none found.\n' +
@@ -409,26 +446,25 @@ export default class Parser {
         )
       );
     } else {
-      const missingOrInvalidMutations = [];
-      for (const menuItem of musicMultiSelectMenuItems) {
-        const mutation = mutations.find((mutation) => mutation.payload?.musicFormBooleanChoice?.id === menuItem.form_item_entity_key);
+      const missing_or_invalid_mutations = [];
+
+      for (const menu_item of music_multi_select_menu_items) {
+        const mutation = mutations
+          .find((mutation) => mutation.payload?.musicFormBooleanChoice?.id === menu_item.form_item_entity_key);
+
         const choice = mutation?.payload.musicFormBooleanChoice;
+
         if (choice?.selected !== undefined && choice?.opaqueToken) {
-          menuItem.selected = choice.selected;
-          if (menuItem.endpoint?.browse) {
-            menuItem.endpoint.browse.form_data = {
-              selectedValues: [ choice.opaqueToken ]
-            };
-          }
+          menu_item.selected = choice.selected;
         } else {
-          missingOrInvalidMutations.push(`'${menuItem.title}'`);
+          missing_or_invalid_mutations.push(`'${menu_item.title}'`);
         }
       }
-      if (missingOrInvalidMutations.length > 0) {
+      if (missing_or_invalid_mutations.length > 0) {
         console.warn(
           new InnertubeError(
-            `Mutation data missing or invalid for ${missingOrInvalidMutations.length} out of ${musicMultiSelectMenuItems.length} MusicMultiSelectMenuItems. ` +
-            `The titles of the failed items are: ${missingOrInvalidMutations.join(', ')}.\n` +
+            `Mutation data missing or invalid for ${missing_or_invalid_mutations.length} out of ${music_multi_select_menu_items.length} MusicMultiSelectMenuItems. ` +
+            `The titles of the failed items are: ${missing_or_invalid_mutations.join(', ')}.\n` +
             `This is a bug, please report it at ${package_json.bugs.url}`
           )
         );
@@ -436,12 +472,13 @@ export default class Parser {
     }
   }
 
-  static formatError({ classname, classdata, err }: { classname: string, classdata: any, err: any }) {
+  static #printError({ classname, classdata, err }: ParserError) {
     if (err.code == 'MODULE_NOT_FOUND') {
       return console.warn(
         new InnertubeError(
           `${classname} not found!\n` +
-          `This is a bug, please report it at ${package_json.bugs.url}`, classdata)
+          `This is a bug, want to help us fix it? Follow the instructions at ${package_json.homepage.split('#')[0]}/blob/main/docs/updating-the-parser.md or report it at ${package_json.bugs.url}!`, classdata
+        )
       );
     }
 
@@ -460,6 +497,7 @@ export default class Parser {
   }
 
   static ignore_list = new Set<string>([
+    'AdSlot',
     'DisplayAd',
     'SearchPyv',
     'MealbarPromo',

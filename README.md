@@ -42,7 +42,9 @@
   [![Codefactor](https://www.codefactor.io/repository/github/luanrt/youtube.js/badge)][codefactor]
   [![Downloads](https://img.shields.io/npm/dt/youtubei.js)][npm]
   [![Say thanks](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)][say-thanks]
-
+  <br>
+  [![Donate](https://img.shields.io/badge/donate-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#white)][github-sponsors]
+ 
 </div>
 
 <!-- SPONSORS -->
@@ -404,7 +406,32 @@ See [`./examples/comments`](https://github.com/LuanRT/YouTube.js/blob/main/examp
 ### getHomeFeed()
 Retrieves YouTube's home feed.
 
-**Returns**: `Promise.<FilterableFeed>`
+**Returns**: `Promise.<HomeFeed>`
+
+<details>
+<summary>Methods & Getters</summary>
+<p>
+
+- `<home_feed>#videos`
+  - Returns all videos in the home feed.
+
+- `<home_feed>#posts`
+  - Returns all posts in the home feed.
+
+- `<home_feed>#shelfs`
+  - Returns all shelfs in the home feed.
+
+- `<home_feed>#filters`
+  - Returns available filters.
+
+- `<home_feed>#applyFilter(name | ChipCloudChip)`
+  - Applies given filter and returns a new HomeFeed instance.
+
+- `<home_feed>#getContinuation()`
+  - Retrieves feed continuation.
+
+</p>
+</details> 
 
 <a name="getlibrary"></a>
 ### getLibrary()
@@ -576,6 +603,7 @@ For example, you may want to call an endpoint directly, that can be achieved wit
 // ...
 
 const payload = {
+  // ...
   videoId: 'jLTOuvBTLxA',
   client: 'YTMUSIC', // InnerTube client, can be ANDROID, YTMUSIC, YTMUSIC_ANDROID, WEB or TV_EMBEDDED
   parse: true // tells YouTube.js to parse the response, this is not sent to InnerTube.
@@ -591,14 +619,14 @@ Or maybe there's an interesting `NavigationEndpoint` in a parsed response and we
 ```ts
 // ...
 const artist = await yt.music.getArtist('UC52ZqHVQz5OoGhvbWiRal6g');
-const albums = artist.sections[1].as(MusicCarouselShelf);
+const albums = artist.sections[1].as(YTNodes.MusicCarouselShelf);
 
 // Say we have a button and want to “click” it
-const button = albums.as(MusicCarouselShelf).header?.more_content;
+const button = albums.as(YTNodes.MusicCarouselShelf).header?.more_content;
   
 if (button) {
   // To do that, we can call its navigation endpoint:
-  const page = await button.endpoint.call(yt.actions, 'YTMUSIC', true);
+  const page = await button.endpoint.call(yt.actions, { parse: true, client: 'YTMUSIC' });
   console.info(page);
 }
 ```
@@ -607,24 +635,11 @@ if (button) {
 
 If you're working on an extension for the library or just want to have nicely typed and sanitized InnerTube responses for a project then have a look at our powerful parser!
 
-<details>
-<summary>Example:</summary>
-<p>
-
+Example:
 ```ts
 // See ./examples/parser
 
-import { Parser } from 'youtubei.js';
-
-import SectionList from 'youtubei.js/dist/src/parser/classes/SectionList';
-import SingleColumnBrowseResults from 'youtubei.js/dist/src/parser/classes/SingleColumnBrowseResults';
-
-import MusicVisualHeader from 'youtubei.js/dist/src/parser/classes/MusicVisualHeader';
-import MusicImmersiveHeader from 'youtubei.js/dist/src/parser/classes/MusicImmersiveHeader';
-import MusicCarouselShelf from 'youtubei.js/dist/src/parser/classes/MusicCarouselShelf';
-import MusicDescriptionShelf from 'youtubei.js/dist/src/parser/classes/MusicDescriptionShelf';
-import MusicShelf from 'youtubei.js/dist/src/parser/classes/MusicShelf';
-
+import { Parser, YTNodes } from 'youtubei.js';
 import { readFileSync } from 'fs';
 
 // Artist page response from YouTube Music
@@ -632,7 +647,7 @@ const data = readFileSync('./artist.json').toString();
 
 const page = Parser.parseResponse(JSON.parse(data));
 
-const header = page.header.item().as(MusicImmersiveHeader, MusicVisualHeader);
+const header = page.header?.item().as(YTNodes.MusicImmersiveHeader, YTNodes.MusicVisualHeader);
 
 console.info('Header:', header);
 
@@ -640,7 +655,8 @@ console.info('Header:', header);
 // A proxy intercepts access to the actual data, allowing
 // the parser to add type safety and many utility methods
 // that make working with InnerTube much easier.
-const tab = page.contents.item().as(SingleColumnBrowseResults).tabs.get({ selected: false });
+const tab = page.contents.item().as(YTNodes.SingleColumnBrowseResults).tabs.firstOfType(YTNodes.Tab);
+
 
 if (!tab)
   throw new Error('Target tab not found');
@@ -648,13 +664,10 @@ if (!tab)
 if (!tab.content)
   throw new Error('Target tab appears to be empty');
   
-const sections = tab.content?.as(SectionList).contents.array().as(MusicCarouselShelf, MusicDescriptionShelf, MusicShelf);
+const sections = tab.content?.as(YTNodes.SectionList).contents.array().as(YTNodes.MusicCarouselShelf, YTNodes.MusicDescriptionShelf, YTNodes.MusicShelf);
 
 console.info('Sections:', sections);
 ```
-
-</p>
-</details>
 
 Detailed documentation can be found [here](https://github.com/LuanRT/YouTube.js/blob/main/src/parser).
 
